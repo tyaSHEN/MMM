@@ -1,14 +1,22 @@
 library(tidyverse)
 library(nnet)
 library(doParallel)
+library(haven)
 
 
 # clean data----
-# only need to run once, cleaned data will be stored in folder "output2"
-# data.Rdata is the R data.frame converted from "randhrs1992_2018v1_STATA.zip"
+# only need to run once, cleaned data will be stored in folder "output"
+if(!dir.exists(file.path("output"))){dir.create(file.path("output"))}
+
+# this import is slow so we will convert it to a Rdata file first
+# data.Rdata stores a R data.frame named "Raw" converted from "randhrs1992_2018v1_STATA.zip"
 # https://hrsdata.isr.umich.edu/data-products/rand-hrs-longitudinal-file-2018
 
+# Raw <- read_dta("randhrs1992_2018v2.dta")
+# save(Raw,file="data.RData")
+
 load("data.RData")
+
 # two health dimension ---
 ADL = Raw %>% select("rahhidpn",
                      paste0("r",c(2:14),"adla"))
@@ -198,6 +206,7 @@ for (CO in unique(YAW$FY)) {
 
 # CMM----
 ## estimation ----
+if(!dir.exists(file.path("output/CMM"))){dir.create(file.path("output/CMM"))}
 YAW = data.frame(FY = c(1934,1944,1924,1934,1914,1924),
                  FA = c(60,60,70,70,80,80),
                  WA = c(4,9,4,9,4,9))
@@ -219,7 +228,7 @@ for (CO in co) {
     L = length(Age)
     for (z in 1:6) {
       if(z==6){iteration = 1}
-      ALL = foreach(iter=1:iteration,.packages= c("tidyverse","nnet")) %dopar% {
+      ALL = foreach(iter=1:iteration,.packages = c("tidyverse","nnet","haven")) %dopar% {
         
         if(iteration != 1){
         C_CON = c()
@@ -306,7 +315,7 @@ for (CO in co) {
     Age = yaw[row,"FA"]:(yaw[row,"FA"]+9)
     L = length(Age)
     for (z in 1:6) {
-      load(paste0("output/test1/ALL",CO,yaw[row,"FA"],".",z,".RData"))
+      load(paste0("output/CMM/ALL",CO,yaw[row,"FA"],".",z,".RData"))
       ALL=get(paste0("ALL",CO,yaw[row,"FA"],".",z))
       
       iteration = length(ALL)
@@ -345,7 +354,7 @@ for (CO in co) {
         TIME[[iter]]=time_spend
       }
       assign(paste0("TIME",CO,yaw[row,"FA"],".",z),TIME)
-      save(list = c(paste0("TIME",CO,yaw[row,"FA"],".",z)),file = paste0("output/test1/TIME",CO,yaw[row,"FA"],".",z,".RData"))
+      save(list = c(paste0("TIME",CO,yaw[row,"FA"],".",z)),file = paste0("output/CMM/TIME",CO,yaw[row,"FA"],".",z,".RData"))
       rm(list = c(paste0("TIME",CO,yaw[row,"FA"],".",z),"ALL","TIME","S_all","time_spend"))
     }
   }
@@ -396,6 +405,7 @@ save(list = c("RES"),file = paste0("output/",ver,"/RES.RData"))
 
 # MMM (recursive) ----
 ## estimation ---- 
+if(!dir.exists(file.path("output/MMM_rec"))){dir.create(file.path("output/MMM_rec"))}
 YAW = data.frame(FY = c(1934,1944,1924,1934,1914,1924),
                  FA = c(60,60,70,70,80,80),
                  WA = c(4,9,4,9,4,9))
@@ -557,7 +567,7 @@ for (CO in co) {
         
       }
       assign(paste0("ALL",CO,yaw[row,"FA"],".",z),ALL)
-      save(list = c(paste0("ALL",CO,yaw[row,"FA"],".",z)),file = paste0("output/test2/ALL",CO,yaw[row,"FA"],".",z,".RData"))
+      save(list = c(paste0("ALL",CO,yaw[row,"FA"],".",z)),file = paste0("output/MMM_rec/ALL",CO,yaw[row,"FA"],".",z,".RData"))
       rm(list = paste0("ALL",CO,yaw[row,"FA"],".",z))
     }
   }
@@ -571,7 +581,7 @@ for (CO in co) {
     Age = yaw[row,"FA"]:(yaw[row,"FA"]+9)
     L = length(Age)
     for (z in 1:6) {
-      load(paste0("output/test2/ALL",CO,yaw[row,"FA"],".",z,".RData"))
+      load(paste0("output/MMM_rec/ALL",CO,yaw[row,"FA"],".",z,".RData"))
       ALL=get(paste0("ALL",CO,yaw[row,"FA"],".",z))
       
       iteration = length(ALL)
@@ -610,7 +620,7 @@ for (CO in co) {
         TIME[[iter]]=time_spend
       }
       assign(paste0("TIME",CO,yaw[row,"FA"],".",z),TIME)
-      save(list = c(paste0("TIME",CO,yaw[row,"FA"],".",z)),file = paste0("output/test2/TIME",CO,yaw[row,"FA"],".",z,".RData"))
+      save(list = c(paste0("TIME",CO,yaw[row,"FA"],".",z)),file = paste0("output/MMM_rec/TIME",CO,yaw[row,"FA"],".",z,".RData"))
       rm(list = c(paste0("TIME",CO,yaw[row,"FA"],".",z),"ALL","TIME","S_all","time_spend"))
     }
   }
@@ -660,6 +670,7 @@ save(list = c("RES"),file = paste0("output/",ver,"/RES.RData"))
 
 # MMM (reduced-form) ----
 ## estimation ---- 
+if(!dir.exists(file.path("output/MMM_red"))){dir.create(file.path("output/MMM_red"))}
 YAW = data.frame(FY = c(1934,1944,1924,1934,1914,1924),
                  FA = c(60,60,70,70,80,80),
                  WA = c(4,9,4,9,4,9))
@@ -820,7 +831,7 @@ for (CO in co) {
         
       }
       assign(paste0("ALL",CO,yaw[row,"FA"],".",z),ALL)
-      save(list = c(paste0("ALL",CO,yaw[row,"FA"],".",z)),file = paste0("output/test5/ALL",CO,yaw[row,"FA"],".",z,".RData"))
+      save(list = c(paste0("ALL",CO,yaw[row,"FA"],".",z)),file = paste0("output/MMM_red/ALL",CO,yaw[row,"FA"],".",z,".RData"))
       rm(list = paste0("ALL",CO,yaw[row,"FA"],".",z))
     }
   }
@@ -833,7 +844,7 @@ for (CO in co) {
     Age = yaw[row,"FA"]:(yaw[row,"FA"]+9)
     L = length(Age)
     for (z in 1:6) {
-      load(paste0("output/test5/ALL",CO,yaw[row,"FA"],".",z,".RData"))
+      load(paste0("output/MMM_red/ALL",CO,yaw[row,"FA"],".",z,".RData"))
       ALL=get(paste0("ALL",CO,yaw[row,"FA"],".",z))
       
       iteration = length(ALL)
@@ -872,7 +883,7 @@ for (CO in co) {
         TIME[[iter]]=time_spend
       }
       assign(paste0("TIME",CO,yaw[row,"FA"],".",z),TIME)
-      save(list = c(paste0("TIME",CO,yaw[row,"FA"],".",z)),file = paste0("output/test5/TIME",CO,yaw[row,"FA"],".",z,".RData"))
+      save(list = c(paste0("TIME",CO,yaw[row,"FA"],".",z)),file = paste0("output/MMM_red/TIME",CO,yaw[row,"FA"],".",z,".RData"))
       rm(list = c(paste0("TIME",CO,yaw[row,"FA"],".",z),"ALL","TIME","S_all","time_spend"))
     }
   }

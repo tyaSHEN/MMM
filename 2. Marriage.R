@@ -5,12 +5,17 @@ library(haven)
 library(data.table)
 
 # clean data----
-# only need to run once, cleaned data will be stored in folder "output2"
-# data.Rdata is the R data.frame converted from "randhrs1992_2018v1_STATA.zip"
+# only need to run once, cleaned data will be stored in folder "output"
+if(!dir.exists(file.path("output2"))){dir.create(file.path("output2"))}
+
+# this import is slow so we will convert it to a Rdata file first
+# data.Rdata stores a R data.frame named "Raw" converted from "randhrs1992_2018v1_STATA.zip"
 # https://hrsdata.isr.umich.edu/data-products/rand-hrs-longitudinal-file-2018
 
-load("HRS data.RData") # it is named as variable `Raw`
+# Raw <- read_dta("randhrs1992_2018v2.dta")
+# save(Raw,file="data.RData")
 
+load("data.RData")
 
 MA= Raw %>% select("rahhidpn",
                    paste0("r",c(2:14),"mstat")) 
