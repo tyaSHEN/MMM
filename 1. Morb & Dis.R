@@ -11,8 +11,8 @@ if(!dir.exists(file.path("output"))){dir.create(file.path("output"))}
 # this import is slow so we will convert it to a Rdata file first
 # data.Rdata stores a R data.frame named "Raw" converted from "randhrs1992_2018v1_STATA.zip"
 # https://hrsdata.isr.umich.edu/data-products/rand-hrs-longitudinal-file-2018
-
-# Raw <- read_dta("randhrs1992_2018v2.dta")
+# The code should be able to run with the latest data as well
+# Raw <- read_dta("randhrs1992_2018v1.dta")
 # save(Raw,file="data.RData")
 
 load("data.RData")
