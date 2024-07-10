@@ -1,7 +1,7 @@
 # Dynamics of Health Expectancy: An Introduction to the Multiple Multistate Method (MMM)
 ***Tianyu Shen, Collin F. Payne and Maria Jahromi***
 
-This is a repository for our upcoming paper in [*Sociological Methods & Research*](https://journals.sagepub.com/toc/SMR/0/0).
+This is a repository for our (forthcoming) paper in [*Sociological Methods & Research*](https://journals.sagepub.com/toc/SMR/0/0).
 
 Details of the methodology and the results are included in our paper.
 
